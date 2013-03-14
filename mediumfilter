@@ -1,0 +1,91 @@
+/*
+
+Reading distanct from HRLV MaxSonar-EZ, MB1003 ;
+below 9 inches/22 cm it returns the same value ;
+
+Arduino version:  Mega 2560
+This code is modified from a post on Arduino Forum;
+
+Wiring: 
+connect  sensor Pin 3 - Analog Voltage Output to Arduino analog pin0 ; 
+sensor  V+ Pin 6 - Positive Power, Vcc to Arduino 5V + ;
+sensor ground Pin 7 to Arduino ground pin ;
+100uf capacitor between sensor Pin 6 and 7;
+
+March 2013
+molmol@openmolmol.com
+
+*/
+
+const int analogPin = 0;
+ 
+long inch, w, median ;
+long middle, samples;
+
+//analog signal entry and filtered output signal
+long reading[255];
+
+void setup() {
+
+  Serial.begin(9600);
+  pinMode(analogPin, INPUT);
+  
+  //number of samples (has to be odd number)
+  samples=11;
+}
+
+void loop() {
+  
+  
+  // fill the array with N number of samples
+  for (int k=0; k< samples; k++){
+
+    
+    //read the sensor analog output and stock the value in the array
+    reading[k]=analogRead(analogPin);
+    }
+
+
+  //sort the value of the array
+for (int i=0; i< samples-1; i++){
+    for (int j=i+1; j< samples; j++){    
+      if (reading[i] > reading[j]){
+        w = reading[i];
+        reading[i] = reading[j];
+        reading[j] =w;
+        }
+      }
+
+  }
+  
+  //find the middle value of the sample    
+  middle=(samples+1)/2;
+  median = reading[middle];
+  
+  
+  
+  
+/* 
+Caculating the distance from analog voltage
+[(Vcc/512) = Vi]
+
+Vcc = Supplied Voltage  (5V)
+Vi = Volts per inch (Scaling)
+
+[(Vm/Vi) = Ri]
+Vm = Measured Voltage
+Vi = Volts per Inch (Scaling)
+Ri = Range in inches
+*/ 
+
+
+ // place the median value as the output value 
+   inch = (median/9.766) + 4 ;
+
+
+Serial.print(inch); 
+Serial.print("\t");    // prints a tab
+Serial.print("inch");  // prints a label
+Serial.println("");    // prints another carriage return or print as an ASCII-encoded decimal
+
+}
