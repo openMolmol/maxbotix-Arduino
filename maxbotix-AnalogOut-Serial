@@ -1,0 +1,81 @@
+/*
+ Analog input, analog output, serial output
+ 
+  Reads an analog input pin, maps the result to a range from 0 to 255
+  and uses the result to set the pulsewidth modulation (PWM) of an output pin.
+  Also prints the results to the serial monitor.
+ 
+  The circuit:
+ * Maxbotic ultrasonic sensor connected to analog pin 0. 
+ * LED connected from digital pin 9 to ground
+
+This version added medium filter and distance calulation in inches for maxbotix ultrasonic sensor
+
+ This example code is in the public domain. 
+ Created  by Tom Igoe == 9 Apr 2012
+
+
+ Modified by molmol March 15 2013
+ molmol@openmolmol.com
+ */
+ 
+
+const int analogInPin = A0;  
+const int analogOutPin = 9; 
+const int ledPin =  9;
+
+int sensorValue = 0;       
+int outputValue = 0;        
+
+long inch, w, median ;
+long middle, samples;
+long reading[255];
+
+
+void setup() {
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600); 
+  
+  pinMode(analogInPin, INPUT);
+  pinMode(ledPin, OUTPUT); 
+   //number of samples (has to be odd number)
+  samples=11;  
+}
+
+void loop() {
+
+  for (int k=0; k< samples; k++){
+    reading[k]=analogRead(analogInPin);
+    }
+
+    for (int i=0; i< samples-1; i++){
+      
+          for (int j=i+1; j< samples; j++){
+ 
+       if (reading[i] > reading[j]){
+        w = reading[i];
+        reading[i] = reading[j];
+        reading[j] =w;
+        }
+      
+       }
+  
+     }
+  
+  //find the middle value of the sample    
+  middle=(samples+1)/2;
+  median = reading[middle];
+  inch = (median/9.766) + 4 ;
+           
+    outputValue = map(median, 60, 1100, 0, 255); 
+    analogWrite(ledPin, outputValue); 
+    
+    Serial.print("outputvalue");  
+    Serial.println(outputValue);  
+    Serial.print(inch); 
+    Serial.print("inch"); 
+    Serial.print("\t");    
+    Serial.println("");   
+
+      delay(300);   
+}
