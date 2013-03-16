@@ -1,4 +1,7 @@
 maxbotix-Arduino
 ================
 
-use medium filter with Maxbotic HRLV MaxSonar EZ
+experiment with Maxbotix ultrasonic sensor..
+
+molmol@openmolmol.com
+2013
